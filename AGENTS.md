@@ -1,6 +1,6 @@
-# Remote Career Ops
+# RemoteFit
 
-Remote Career Ops is a local-first, Codex-driven job-search workflow for Chinese-speaking candidates seeking remote work in China or abroad.
+RemoteFit is a local-first remote-job eligibility verifier for Chinese-speaking candidates. Its core question is whether a role can actually be performed by a candidate residing in China.
 
 ## Product boundary
 

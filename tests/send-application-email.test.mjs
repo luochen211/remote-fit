@@ -7,7 +7,7 @@ import test from 'node:test';
 import { buildApproval, validateApproval } from '../scripts/send-application-email.mjs';
 
 function fixture() {
-  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'remote-career-email-'));
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'remote-fit-email-'));
   const attachment = path.join(directory, 'cv.pdf');
   fs.writeFileSync(attachment, 'verified cv');
   return { directory, attachment };
@@ -48,4 +48,3 @@ test('rejects an attachment changed after approval', (context) => {
   fs.writeFileSync(attachment, 'changed cv');
   assert.throws(() => validateApproval(approval, approval.confirmationCode, now + 1000), /Attachment changed/);
 });
-

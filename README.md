@@ -1,6 +1,8 @@
-# Remote Career Ops
+# RemoteFit
 
-面向中文用户、由 Codex 驱动的本地远程求职工作流。
+**Verify whether a remote job is truly workable from China.**
+
+RemoteFit 是面向中文用户的远程岗位资格验证工具，由 Codex 在本地驱动。
 
 它不只是搜索包含 `remote` 的职位，而是回答更重要的问题：
 
@@ -28,7 +30,7 @@ node scripts/evaluate-remote.mjs --file path/to/job-description.txt --summary
 然后在仓库根目录启动 Codex，并输入：
 
 ```text
-使用 remote-job-search 评估这个岗位是否适合居住在中国的候选人：<岗位链接或 JD>
+使用 remote-fit 评估这个岗位是否真的允许候选人在中国远程工作：<岗位链接或 JD>
 ```
 
 ## 评估结果
