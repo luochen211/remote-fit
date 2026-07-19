@@ -14,6 +14,7 @@ test('landing page includes core product and safety sections', () => {
   assert.match(html, /id="verify"/);
   assert.match(html, /id="safety"/);
   assert.match(html, /第二次确认/);
+  assert.match(html, /岗位链接/);
 });
 
 test('landing page declares responsive and reduced-motion behavior', () => {
@@ -21,4 +22,3 @@ test('landing page declares responsive and reduced-motion behavior', () => {
   assert.match(css, /@media \(max-width: 600px\)/);
   assert.match(css, /prefers-reduced-motion/);
 });
-

@@ -28,6 +28,7 @@ cp config/profile.example.yml config/profile.yml
 cp cv.template.md cv.md
 npm test
 node scripts/evaluate-remote.mjs --file path/to/job-description.txt --summary
+node scripts/evaluate-url.mjs https://company.com/jobs/123 --summary
 ```
 
 然后在仓库根目录启动 Codex，并输入：
@@ -35,6 +36,26 @@ node scripts/evaluate-remote.mjs --file path/to/job-description.txt --summary
 ```text
 使用 remote-fit 评估这个岗位是否真的允许候选人在中国远程工作：<岗位链接或 JD>
 ```
+
+## 岗位链接分析
+
+`evaluate-url.mjs` 会：
+
+1. 拦截 localhost、私网 IP、带凭据 URL 和不安全重定向。
+2. 优先读取 Schema.org `JobPosting` JSON-LD。
+3. 没有结构化数据时，从 `main`、`article` 或页面正文提取 JD。
+4. 记录最终 URL、提取方式和字符数。
+5. 检查过期文案和 `validThrough`，过期信号优先于通用 Apply 文字。
+6. 将提取的 JD 交给同一套行业策略和远程资格引擎。
+
+```bash
+node scripts/evaluate-url.mjs \
+  https://company.com/jobs/123 \
+  --policy config/content-policy.json \
+  --save output/company-role.txt
+```
+
+若招聘网站返回 403 或依赖 JavaScript 渲染，命令会明确报告抓取失败。此时应由 Codex 通过浏览器读取，或请用户粘贴 JD，不会把抓取失败解释为岗位过期。
 
 ## 评估结果
 

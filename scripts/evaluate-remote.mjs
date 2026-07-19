@@ -59,7 +59,8 @@ const rules = {
     /居家办公/
   ],
   hybrid: [
-    /\bhybrid\b/,
+    /\bhybrid (?:role|position|schedule|work|working arrangement)\b/,
+    /(?:required|expected).{0,30}(?:office|on-site|onsite)/,
     /days? (?:per|a) week in (?:the )?office/,
     /混合办公/,
     /每周.{0,8}到岗/,
@@ -85,7 +86,9 @@ const rules = {
     /\b(?:us|u\.s\.|usa) only\b/,
     /\b(?:eu|emea|europe|uk|canada) only\b/,
     /must (?:be|reside|live) (?:in|within) (?:the )?(?:us|u\.s\.|usa|eu|emea|europe|uk|canada)/,
+    /open to candidates (?:located )?(?:anywhere )?in (?:the )?(?:us|u\.s\.|usa|eu|emea|europe|uk|canada)/,
     /remote (?:within|in) (?:the )?(?:us|u\.s\.|usa|eu|emea|europe|uk|canada)/,
+    /\bremote,\s*(?:italy|germany|france|spain|portugal|ireland|netherlands|belgium|sweden|norway|denmark|finland|switzerland|austria|poland|romania|australia|new zealand|japan|india|singapore|brazil|mexico)\b/,
     /仅限.{0,12}(?:美国|欧盟|欧洲|英国|加拿大)/
   ],
   relocation: [
@@ -104,12 +107,12 @@ const rules = {
     /不提供签证/,
     /安全许可/
   ],
-  contractor: [/independent contractor/, /\bcontractor\b/, /freelance/, /合同工/, /自由职业/],
+  contractor: [/this is an independent contractor/, /independent contractor (?:position|agreement|engagement)/, /engaged as (?:an? )?contractor/, /freelance/, /合同工/, /自由职业/],
   eor: [/employer of record/, /\beor\b/, /deel/, /remote\.com/],
   employee: [/full[- ]time employee/, /permanent employee/, /正式员工/, /劳动合同/],
   timezone: [
     /(?:utc|gmt)\s*[+-]\s*\d{1,2}(?::\d{2})?/g,
-    /(?:pst|pdt|est|edt|cet|cest|aest|ist)\b/g,
+    /\b(?:pst|pdt|est|edt|cet|cest|aest|ist)\b/g,
     /overlap.{0,30}(?:hours?|timezone|time zone)/g,
     /时区.{0,20}(?:重叠|交叉|要求)/g
   ],

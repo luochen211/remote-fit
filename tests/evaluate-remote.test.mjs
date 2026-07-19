@@ -33,6 +33,30 @@ test('explicit region restriction overrides generic remote wording', () => {
   assert.equal(result.chinaEligibility, 'not-eligible');
 });
 
+test('recognizes country-specific remote labels', () => {
+  const result = evaluate('Account Executive - Italy. Remote, Italy. Apply for this job.');
+  assert.equal(result.remoteType, 'region-restricted-remote');
+  assert.equal(result.chinaEligibility, 'not-eligible');
+});
+
+test('does not treat legal contractor boilerplate or words ending in ist as job terms', () => {
+  const result = evaluate('Remote role. We are a federal contractor. Fortune 500 list published in June.');
+  assert.equal(result.engagement, 'unknown');
+  assert.equal(result.timezone.status, 'unknown');
+});
+
+test('handles optional hybrid offices and contractor privacy boilerplate', () => {
+  const result = evaluate(`
+    We are a remote-friendly company, and this position is open to candidates anywhere in the U.S.
+    100% remote opportunity. We have office locations for hybrid/onsite work preference.
+    We may evaluate your application for employment or an independent contractor role, as applicable.
+  `);
+  assert.equal(result.remoteType, 'region-restricted-remote');
+  assert.equal(result.chinaEligibility, 'not-eligible');
+  assert.equal(result.engagement, 'unknown');
+  assert.equal(result.signals.hybrid, false);
+});
+
 test('hybrid requirement is not treated as China-eligible remote work', () => {
   const result = evaluate(`
     混合办公，每周需要到岗两天，其余时间可远程工作。
