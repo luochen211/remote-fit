@@ -26,6 +26,7 @@ RemoteFit 是面向中文用户的远程岗位资格验证工具，由 Codex 在
 ```bash
 cp config/profile.example.yml config/profile.yml
 cp cv.template.md cv.md
+npx playwright install chromium
 npm test
 node scripts/evaluate-remote.mjs --file path/to/job-description.txt --summary
 node scripts/evaluate-url.mjs https://company.com/jobs/123 --summary
@@ -42,11 +43,12 @@ node scripts/evaluate-url.mjs https://company.com/jobs/123 --summary
 `evaluate-url.mjs` 会：
 
 1. 拦截 localhost、私网 IP、带凭据 URL 和不安全重定向。
-2. 优先读取 Schema.org `JobPosting` JSON-LD。
-3. 没有结构化数据时，从 `main`、`article` 或页面正文提取 JD。
-4. 记录最终 URL、提取方式和字符数。
-5. 检查过期文案和 `validThrough`，过期信号优先于通用 Apply 文字。
-6. 将提取的 JD 交给同一套行业策略和远程资格引擎。
+2. 对 Greenhouse、Lever、Ashby、Workday 优先读取官方公开 ATS 接口。
+3. 普通页面优先读取 Schema.org `JobPosting` JSON-LD，再提取正文。
+4. 遇到 JavaScript 页面、403、429、503 或正文不足时，使用只读 Chromium 兜底。
+5. 记录最终 URL、提取方式和字符数。
+6. 检查过期文案、`validThrough` 和重定向后职位 ID 是否仍存在；过期信号优先于通用 Apply 文字。
+7. 将提取的 JD 交给同一套行业策略和远程资格引擎。
 
 ```bash
 node scripts/evaluate-url.mjs \
@@ -55,7 +57,7 @@ node scripts/evaluate-url.mjs \
   --save output/company-role.txt
 ```
 
-若招聘网站返回 403 或依赖 JavaScript 渲染，命令会明确报告抓取失败。此时应由 Codex 通过浏览器读取，或请用户粘贴 JD，不会把抓取失败解释为岗位过期。
+如果浏览器仍被验证码或反爬页面拦截，命令会返回“无法确认”并要求粘贴 JD。403、503、Cloudflare 页面和提取失败都不会被解释为岗位过期。
 
 ## 评估结果
 

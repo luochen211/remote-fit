@@ -9,7 +9,7 @@
     "evaluate:url": "node scripts/evaluate-url.mjs",
     "email": "node scripts/send-application-email.mjs",
     "test": "node --test",
-    "check": "node --check scripts/evaluate-remote.mjs && node --check scripts/evaluate-url.mjs && node --check scripts/send-application-email.mjs && node --check site.js && node --test"
+    "check": "node --check scripts/evaluate-remote.mjs && node --check scripts/evaluate-url.mjs && node --check scripts/liveness.mjs && node --check scripts/ats-api.mjs && node --check scripts/browser-extract.mjs && node --check scripts/send-application-email.mjs && node --check site.js && node --test"
   },
   "keywords": [
     "remote-work",
@@ -20,6 +20,7 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "nodemailer": "^9.0.3"
+    "nodemailer": "^9.0.3",
+    "playwright": "^1.61.1"
   }
 }

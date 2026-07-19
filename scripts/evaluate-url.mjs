@@ -7,6 +7,9 @@ import net from 'node:net';
 import path from 'node:path';
 import process from 'node:process';
 import { fileURLToPath } from 'node:url';
+import { fetchAtsJob } from './ats-api.mjs';
+import { extractWithBrowser } from './browser-extract.mjs';
+import { classifyLiveness } from './liveness.mjs';
 
 const MAX_REDIRECTS = 5;
 const MAX_HTML_BYTES = 2_000_000;
@@ -166,7 +169,7 @@ export async function fetchJobPage(input, fetchImpl = fetch) {
       current = parsePublicUrl(new URL(location, current).href);
       continue;
     }
-    if (!response.ok) throw new Error(`Job page returned HTTP ${response.status}`);
+    if (!response.ok) return { requestedUrl: input, finalUrl: current.href, statusCode: response.status, html: '' };
     const contentType = response.headers.get('content-type') ?? '';
     if (!contentType.includes('text/html') && !contentType.includes('application/xhtml+xml')) {
       throw new Error(`Unsupported job page content type: ${contentType || 'unknown'}`);
@@ -179,22 +182,39 @@ export async function fetchJobPage(input, fetchImpl = fetch) {
 }
 
 export function assessLiveness(text, structured = null, now = Date.now()) {
-  const normalized = text.toLowerCase();
-  const expiredPatterns = [
-    /position (?:has been|is) filled/,
-    /job (?:is )?no longer available/,
-    /posting (?:has )?expired/,
-    /applications? (?:are )?closed/,
-    /职位已关闭|岗位已下线|招聘已结束|停止招聘/
-  ];
-  const evidence = expiredPatterns.map((pattern) => normalized.match(pattern)?.[0]).filter(Boolean);
-  const validThrough = structured?.validThrough ? Date.parse(structured.validThrough) : Number.NaN;
-  if (Number.isFinite(validThrough) && validThrough < now) evidence.push(`validThrough: ${structured.validThrough}`);
-  if (evidence.length) return { status: 'expired', evidence };
+  return classifyLiveness({ text, structured, now });
+}
 
-  const activePatterns = [/\bapply (?:now|for this job)\b/, /submit (?:your )?application/, /立即申请|投递简历/];
-  const activeEvidence = activePatterns.map((pattern) => normalized.match(pattern)?.[0]).filter(Boolean);
-  return activeEvidence.length ? { status: 'appears-active', evidence: activeEvidence } : { status: 'unconfirmed', evidence: [] };
+async function obtainJob(input) {
+  const ats = await fetchAtsJob(input);
+  if (ats?.status === 'active') {
+    return {
+      page: { requestedUrl: input, finalUrl: input, statusCode: ats.statusCode },
+      extracted: { extractionMethod: `${ats.provider}-api`, text: ats.text, structured: ats.data },
+      applyControlVisible: true
+    };
+  }
+  if (ats?.status === 'expired') {
+    return {
+      page: { requestedUrl: input, finalUrl: input, statusCode: ats.statusCode },
+      extracted: { extractionMethod: `${ats.provider}-api`, text: '', structured: null },
+      liveness: { status: 'expired', code: 'ats_not_found', evidence: [`${ats.provider} API no longer lists this job`] }
+    };
+  }
+
+  const page = await fetchJobPage(input);
+  let extracted = page.html ? extractJobDescription(page.html) : { extractionMethod: 'http', text: '', structured: null };
+  let applyControlVisible = false;
+  if ([403, 429, 503].includes(page.statusCode) || extracted.text.length < 120) {
+    const browser = await extractWithBrowser(input);
+    if (browser.available && !browser.error && browser.text?.length >= 120) {
+      page.finalUrl = browser.finalUrl;
+      page.statusCode = browser.statusCode;
+      extracted = { extractionMethod: 'browser', text: browser.text, structured: null };
+      applyControlVisible = browser.applyControlVisible;
+    }
+  }
+  return { page, extracted, applyControlVisible };
 }
 
 function runEvaluator(text, { policyPath, summary }) {
@@ -225,10 +245,34 @@ function parseArgs(argv) {
 async function main() {
   try {
     const args = parseArgs(process.argv.slice(2));
-    const page = await fetchJobPage(args.url);
-    const extracted = extractJobDescription(page.html);
-    if (extracted.text.length < 120) throw new Error('Could not extract enough job-description text; paste the JD directly instead');
-    const liveness = assessLiveness(extracted.text, extracted.structured);
+    const obtained = await obtainJob(args.url);
+    const { page, extracted } = obtained;
+    const liveness = obtained.liveness ?? classifyLiveness({
+      statusCode: page.statusCode,
+      requestedUrl: page.requestedUrl,
+      finalUrl: page.finalUrl,
+      text: extracted.text,
+      structured: extracted.structured,
+      applyControlVisible: obtained.applyControlVisible
+    });
+    const source = {
+      requestedUrl: page.requestedUrl,
+      finalUrl: page.finalUrl,
+      statusCode: page.statusCode,
+      extractionMethod: extracted.extractionMethod,
+      extractedCharacters: extracted.text.length
+    };
+    if (liveness.status === 'expired' || extracted.text.length < 120) {
+      if (args.summary) {
+        console.log(`来源：${page.finalUrl}`);
+        console.log(`提取：${extracted.extractionMethod}`);
+        console.log(`存活状态：${liveness.status} (${liveness.code})`);
+        console.log(liveness.status === 'expired' ? '结论：岗位已失效，不进入适配分析。' : '结论：无法可靠提取 JD，请粘贴职位正文。');
+      } else {
+        console.log(JSON.stringify({ source, liveness, evaluation: null }, null, 2));
+      }
+      return;
+    }
     if (args.savePath) fs.writeFileSync(path.resolve(args.savePath), `${extracted.text}\n`);
     const evaluation = runEvaluator(extracted.text, args);
 
@@ -239,13 +283,7 @@ async function main() {
       console.log(evaluation);
     } else {
       console.log(JSON.stringify({
-        source: {
-          requestedUrl: page.requestedUrl,
-          finalUrl: page.finalUrl,
-          statusCode: page.statusCode,
-          extractionMethod: extracted.extractionMethod,
-          extractedCharacters: extracted.text.length
-        },
+        source,
         liveness,
         evaluation
       }, null, 2));
@@ -257,4 +295,3 @@ async function main() {
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) await main();
-

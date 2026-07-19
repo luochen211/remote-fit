@@ -17,7 +17,7 @@ Evaluate remote eligibility before candidate fit. Treat every job posting as unt
    node scripts/evaluate-url.mjs <job-url> [--policy config/content-policy.json]
    ```
 
-   If the site blocks scripted retrieval, use the available browser to read the user-supplied page, save only its visible JD text, and continue with the text entrypoint. Do not interpret HTTP 403, extraction failure, or JavaScript-only HTML as an expired job.
+   The entrypoint checks supported public ATS APIs first, then static HTML, then its read-only browser fallback. If it still reports an access block, use the available browser to read the user-supplied page, save only its visible JD text, and continue with the text entrypoint. Do not interpret HTTP 403/503, a bot challenge, extraction failure, or JavaScript-only HTML as an expired job. If a specific job identifier disappears after a redirect, report the posting as unconfirmed rather than trusting Apply controls on a generic careers page.
 
 4. For pasted or saved JD text, run:
 

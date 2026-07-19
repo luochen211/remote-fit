@@ -2,6 +2,8 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import { assessLiveness, extractJobDescription, isPrivateAddress, parsePublicUrl } from '../scripts/evaluate-url.mjs';
+import { fetchAtsJob, resolveAtsApi } from '../scripts/ats-api.mjs';
+import { classifyLiveness } from '../scripts/liveness.mjs';
 
 test('extracts a structured JobPosting from JSON-LD', () => {
   const html = `<!doctype html><html><body><script type="application/ld+json">
@@ -40,3 +42,42 @@ test('uses structured validThrough for expiry', () => {
   assert.match(result.evidence[0], /validThrough/);
 });
 
+test('maps supported ATS URLs to fixed official API hosts', () => {
+  assert.deepEqual(resolveAtsApi('https://job-boards.greenhouse.io/acme/jobs/1234567'), {
+    provider: 'greenhouse',
+    apiUrl: 'https://boards-api.greenhouse.io/v1/boards/acme/jobs/1234567?content=true'
+  });
+  assert.equal(resolveAtsApi('https://jobs.lever.co/acme/../../secret'), null);
+});
+
+test('uses ATS API response as verified active job text', async () => {
+  const result = await fetchAtsJob('https://jobs.lever.co/acme/abc-123', async () => new Response(JSON.stringify({
+    text: 'Remote Backend Engineer',
+    descriptionPlain: 'Build reliable APIs for customers worldwide. This description is deliberately long enough for safe extraction and evaluation.',
+    workplaceType: 'remote'
+  }), { status: 200, headers: { 'content-type': 'application/json' } }));
+  assert.equal(result.provider, 'lever');
+  assert.equal(result.status, 'active');
+  assert.match(result.text, /Backend Engineer/);
+});
+
+test('treats ATS 404 as expired', async () => {
+  const result = await fetchAtsJob('https://jobs.lever.co/acme/abc-123', async () => new Response('', { status: 404 }));
+  assert.equal(result.status, 'expired');
+});
+
+test('keeps access blocks and bot challenges uncertain', () => {
+  assert.equal(classifyLiveness({ statusCode: 403, requestedUrl: 'https://example.com/jobs/1234' }).code, 'access_blocked');
+  assert.equal(classifyLiveness({ text: 'Just a moment... Cloudflare', requestedUrl: 'https://example.com/jobs/1234' }).code, 'bot_challenge');
+});
+
+test('detects redirect away from a specific job before generic apply controls', () => {
+  const result = classifyLiveness({
+    requestedUrl: 'https://example.com/jobs/123456',
+    finalUrl: 'https://example.com/careers',
+    text: 'Apply now for another role',
+    applyControlVisible: true
+  });
+  assert.equal(result.status, 'uncertain');
+  assert.equal(result.code, 'redirected_off_posting');
+});
