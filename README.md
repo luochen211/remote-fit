@@ -4,6 +4,8 @@
 
 RemoteFit 是面向中文用户的远程岗位资格验证工具，由 Codex 在本地驱动。
 
+产品网站：[luochen211.github.io/remote-fit](https://luochen211.github.io/remote-fit/) · 作者项目：[luo-chen.com](https://luo-chen.com)
+
 它不只是搜索包含 `remote` 的职位，而是回答更重要的问题：
 
 > 这个岗位是否真的允许一名居住在中国的候选人远程完成？

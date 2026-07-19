@@ -8,7 +8,7 @@
     "evaluate": "node scripts/evaluate-remote.mjs",
     "email": "node scripts/send-application-email.mjs",
     "test": "node --test",
-    "check": "node --check scripts/evaluate-remote.mjs && node --check scripts/send-application-email.mjs && node --test"
+    "check": "node --check scripts/evaluate-remote.mjs && node --check scripts/send-application-email.mjs && node --check site.js && node --test"
   },
   "keywords": [
     "remote-work",

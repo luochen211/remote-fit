@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="RemoteFit 帮助中文用户验证一个 Remote 岗位是否真的能在中国完成。">
+    <meta name="theme-color" content="#090b0a">
+    <meta property="og:title" content="RemoteFit — 这个远程岗位，你在中国真的能做吗？">
+    <meta property="og:description" content="验证地域、时区、用工形式与风险，再决定是否申请。">
+    <meta property="og:type" content="website">
+    <title>RemoteFit — Verify remote work from China</title>
+    <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=Noto+Sans+SC:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="site.css">
+  </head>
+  <body>
+    <a class="skip-link" href="#main">跳到主要内容</a>
+
+    <header class="site-header" aria-label="主导航">
+      <a class="brand" href="#top" aria-label="RemoteFit 首页">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span>RemoteFit</span>
+      </a>
+      <nav>
+        <a href="#verify">怎么判断</a>
+        <a href="#safety">安全发送</a>
+        <a class="nav-github" href="https://github.com/luochen211/remote-fit" target="_blank" rel="noreferrer">
+          GitHub
+          <svg aria-hidden="true" viewBox="0 0 16 16"><path d="M5 3h8v8M13 3 4 12"/></svg>
+        </a>
+      </nav>
+    </header>
+
+    <main id="main">
+      <section class="hero" id="top">
+        <div class="hero-image" role="img" aria-label="远程工作者的笔记本电脑与工作台"></div>
+        <div class="hero-grid" aria-hidden="true"></div>
+        <div class="hero-content">
+          <p class="eyebrow hero-reveal">OPEN SOURCE · LOCAL FIRST · CODEX DRIVEN</p>
+          <h1 class="hero-reveal">这个 Remote 岗位，<br><span>你在中国真的能做吗？</span></h1>
+          <p class="hero-copy hero-reveal">RemoteFit 先验证地域、时区、用工形式和风险，再让 Codex 帮你决定是否申请。</p>
+          <div class="hero-actions hero-reveal">
+            <a class="primary-action" href="https://github.com/luochen211/remote-fit" target="_blank" rel="noreferrer">
+              在 GitHub 上查看
+              <svg aria-hidden="true" viewBox="0 0 20 20"><path d="M5 10h10M11 6l4 4-4 4"/></svg>
+            </a>
+            <a class="text-action" href="#verify">看一次判断 <span aria-hidden="true">↓</span></a>
+          </div>
+        </div>
+        <div class="signal" aria-hidden="true">
+          <span class="signal-pulse"></span>
+          <span>31.2304° N</span>
+          <strong>CHINA BASED</strong>
+        </div>
+        <p class="hero-index" aria-hidden="true">01 / ELIGIBILITY</p>
+      </section>
+
+      <section class="manifesto reveal" aria-labelledby="manifesto-title">
+        <p class="section-number">01</p>
+        <div>
+          <p class="eyebrow">REMOTE IS NOT A LOCATION</p>
+          <h2 id="manifesto-title">Remote 只是一个标签。<br>能不能申请，要看证据。</h2>
+        </div>
+        <p class="manifesto-copy">“全球远程”和“仅限美国远程”可能出现在同一个页面。RemoteFit 让排除条件永远优先于模糊的积极表述。</p>
+      </section>
+
+      <section class="verifier" id="verify" aria-labelledby="verify-title">
+        <div class="verifier-intro reveal">
+          <p class="section-number">02</p>
+          <p class="eyebrow">A VERDICT, NOT A VIBE</p>
+          <h2 id="verify-title">先过远程资格门，<br>再谈个人匹配。</h2>
+          <p>每个结论都保留原文证据。没写清的事，就是 unknown，不会被自动解释成“可以”。</p>
+        </div>
+
+        <div class="terminal reveal" aria-label="RemoteFit 岗位评估示例">
+          <div class="terminal-bar">
+            <span>remote-fit / evaluate</span>
+            <span>UTC+8</span>
+          </div>
+          <div class="scan-line" aria-hidden="true"></div>
+          <div class="verdict-row">
+            <span>中国可申请性</span>
+            <strong><i></i>大概率可申请</strong>
+          </div>
+          <dl>
+            <div><dt>远程类型</dt><dd>global-remote</dd></div>
+            <div><dt>用工形式</dt><dd>contractor</dd></div>
+            <div><dt>时区重叠</dt><dd>4 hours · UTC+1</dd></div>
+            <div><dt>工作许可</dt><dd>not required</dd></div>
+            <div><dt>风险信号</dt><dd>none detected</dd></div>
+            <div><dt>置信度</dt><dd>high</dd></div>
+          </dl>
+          <div class="evidence-line">
+            <span>EVIDENCE</span>
+            <p>“Remote worldwide. Independent contractor. Four hours overlap with UTC+1.”</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="dimensions" aria-label="RemoteFit 检查维度">
+        <div class="dimension reveal"><span>01</span><h3>地域</h3><p>全球、APAC，还是仅限某国？</p></div>
+        <div class="dimension reveal"><span>02</span><h3>时区</h3><p>异步协作，还是每天固定重叠？</p></div>
+        <div class="dimension reveal"><span>03</span><h3>合同</h3><p>直接雇佣、EOR，还是跨境合同工？</p></div>
+        <div class="dimension reveal"><span>04</span><h3>风险</h3><p>押金、免费试工与异常沟通信号。</p></div>
+      </section>
+
+      <section class="safety" id="safety" aria-labelledby="safety-title">
+        <div class="safety-copy reveal">
+          <p class="section-number">03</p>
+          <p class="eyebrow">HUMAN IN THE LOOP</p>
+          <h2 id="safety-title">邮件可以自动发送。<br>决定不能自动。</h2>
+          <p>RemoteFit 能通过 SMTP 发送申请邮件，但把用户的两次独立确认写进了状态机。</p>
+        </div>
+
+        <ol class="confirmation-flow reveal">
+          <li>
+            <span>01</span>
+            <div><h3>审阅完整草稿</h3><p>收件人、主题、正文与附件同时展示。</p></div>
+            <strong>REVIEW</strong>
+          </li>
+          <li>
+            <span>02</span>
+            <div><h3>冻结内容</h3><p>生成 30 分钟有效的一次性发送码。</p></div>
+            <strong>FREEZE</strong>
+          </li>
+          <li>
+            <span>03</span>
+            <div><h3>第二次确认</h3><p>只有用户原样返回发送码，SMTP 才会执行。</p></div>
+            <strong>SEND</strong>
+          </li>
+        </ol>
+      </section>
+
+      <section class="opensource" aria-labelledby="opensource-title">
+        <div class="opensource-glow" aria-hidden="true"></div>
+        <div class="opensource-inner reveal">
+          <p class="eyebrow">YOUR DATA. YOUR MACHINE. YOUR CALL.</p>
+          <h2 id="opensource-title">Codex 负责做完。<br>约束负责不越界。</h2>
+          <p>CV、联系方式和投递记录留在本地。系统可以评估、起草、验证和发送邮件，但不会替你提交申请。</p>
+          <div class="code-line" aria-label="RemoteFit Codex 调用示例">
+            <span>$</span><code>codex</code><span class="code-comment"># 然后说：用 remote-fit 评估这个 JD</span>
+          </div>
+          <a class="primary-action" href="https://github.com/luochen211/remote-fit" target="_blank" rel="noreferrer">
+            Fork on GitHub
+            <svg aria-hidden="true" viewBox="0 0 20 20"><path d="M5 10h10M11 6l4 4-4 4"/></svg>
+          </a>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <a class="brand footer-brand" href="#top"><span class="brand-mark" aria-hidden="true"></span>RemoteFit</a>
+      <p>为中文远程工作者而建。</p>
+      <div class="footer-links">
+        <a href="https://github.com/luochen211/remote-fit" target="_blank" rel="noreferrer">GitHub</a>
+        <a href="https://luo-chen.com" target="_blank" rel="noreferrer">luo-chen.com</a>
+        <a href="https://unsplash.com/photos/turned-on-gray-laptop-computer-XJXWbfSo2f0" target="_blank" rel="noreferrer">Photo: Christopher Gower</a>
+      </div>
+    </footer>
+
+    <script src="site.js"></script>
+  </body>
+</html>
+
