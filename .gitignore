@@ -1,4 +1,5 @@
 config/profile.yml
+config/content-policy.json
 cv.md
 evidence/*
 !evidence/.gitkeep

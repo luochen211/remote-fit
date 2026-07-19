@@ -14,6 +14,7 @@ RemoteFit 是面向中文用户的远程岗位资格验证工具，由 Codex 在
 
 - 识别全球远程、地域限制、时区要求和用工形式
 - 发现 `US only`、必须搬迁、必须持有当地工卡等排除条件
+- 提前筛查成人、赌博、灰产、传销、Web3/Crypto 和军工等行业雷区
 - 标记押金、培训费、免费试工和异常沟通方式等风险
 - 输出结构化 JSON，供 Codex 继续完成语义判断
 - 通过 Agent Skill 约束岗位评估和申请流程
@@ -47,6 +48,24 @@ node scripts/evaluate-remote.mjs --file path/to/job-description.txt --summary
 - `confidence`：当前判断的证据充分程度
 
 缺失信息会保持 `unknown`，不会被自动解释成“可以申请”。
+
+## 行业雷区筛查
+
+RemoteFit 会先执行内容策略，再判断远程资格和个人匹配。默认策略：
+
+- 成人、赌博、灰产、传销：`block`
+- Web3/Crypto、武器/军工：`review`
+
+命中会返回类别、动作和原文证据。Web3 不会被自动解释成诈骗，而是按用户策略处理。
+
+```bash
+cp config/content-policy.example.json config/content-policy.json
+node scripts/evaluate-remote.mjs \
+  --file path/to/job-description.txt \
+  --policy config/content-policy.json
+```
+
+每一类支持 `allow`、`review` 或 `block`。本地策略不会被提交。
 
 ## 双确认邮件发送
 

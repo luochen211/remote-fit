@@ -1,0 +1,8 @@
+{
+  "adult": "block",
+  "gambling": "block",
+  "gray-market": "block",
+  "multi-level-marketing": "block",
+  "web3-crypto": "review",
+  "weapons-defense": "review"
+}

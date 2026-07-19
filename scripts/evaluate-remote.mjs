@@ -4,6 +4,7 @@ import fs from 'node:fs';
 
 const args = process.argv.slice(2);
 const fileIndex = args.indexOf('--file');
+const policyIndex = args.indexOf('--policy');
 const wantsSummary = args.includes('--summary');
 
 function usage(message) {
@@ -13,6 +14,7 @@ function usage(message) {
 }
 
 if (fileIndex >= 0 && !args[fileIndex + 1]) usage('--file requires a path');
+if (policyIndex >= 0 && !args[policyIndex + 1]) usage('--policy requires a path');
 
 const input = fileIndex >= 0
   ? fs.readFileSync(args[fileIndex + 1], 'utf8')
@@ -21,6 +23,23 @@ const input = fileIndex >= 0
 if (!input.trim()) usage('Job description is empty');
 
 const normalized = input.toLowerCase().replace(/\s+/g, ' ');
+
+const defaultContentPolicy = {
+  adult: 'block',
+  gambling: 'block',
+  'gray-market': 'block',
+  'multi-level-marketing': 'block',
+  'web3-crypto': 'review',
+  'weapons-defense': 'review'
+};
+
+const contentPolicy = policyIndex >= 0
+  ? { ...defaultContentPolicy, ...JSON.parse(fs.readFileSync(args[policyIndex + 1], 'utf8')) }
+  : defaultContentPolicy;
+
+for (const [category, action] of Object.entries(contentPolicy)) {
+  if (!['allow', 'review', 'block'].includes(action)) usage(`Invalid policy action for ${category}: ${action}`);
+}
 
 const rules = {
   globalRemote: [
@@ -102,6 +121,79 @@ const rules = {
     { pattern: /contact (?:only )?(?:via|on) (?:telegram|whatsapp)/, code: 'off-platform-contact' },
     { pattern: /guaranteed (?:income|earnings)|easy money/, code: 'income-promise' },
     { pattern: /保证收入|轻松赚钱|日结高薪/, code: 'income-promise' }
+  ],
+  industries: [
+    {
+      category: 'adult',
+      patterns: [
+        /adult entertainment/,
+        /porn(?:ography|ographic)?/,
+        /\bnsfw\b/,
+        /erotic content/,
+        /sex (?:toy|work|chat|cam)/,
+        /camming platform/,
+        /成人内容|成人娱乐|色情|色情直播|裸聊|情趣用品/
+      ]
+    },
+    {
+      category: 'gambling',
+      patterns: [
+        /online casino/,
+        /sportsbook/,
+        /sports betting/,
+        /\bigaming\b/,
+        /gambling platform/,
+        /real money poker/,
+        /线上赌场|博彩|赌博|体育投注|真金扑克|外围盘/
+      ]
+    },
+    {
+      category: 'web3-crypto',
+      patterns: [
+        /\bweb3\b/,
+        /blockchain (?:protocol|network|platform|company|startup)/,
+        /cryptocurrency/,
+        /crypto (?:exchange|wallet|protocol|startup|company|trading)/,
+        /\bdefi\b/,
+        /non-fungible token/,
+        /\bnft (?:marketplace|platform|project|gaming)\b/,
+        /tokenomics/,
+        /smart contracts?/,
+        /区块链|加密货币|数字货币|币圈|去中心化金融|智能合约|代币经济/
+      ]
+    },
+    {
+      category: 'gray-market',
+      patterns: [
+        /account farming/,
+        /money mule/,
+        /payment forwarding/,
+        /reshipping (?:job|packages)/,
+        /fake reviews?/,
+        /刷单|跑分|代收款|资金盘|养号|群控|刷评|跑分平台|跨境洗钱/
+      ]
+    },
+    {
+      category: 'multi-level-marketing',
+      patterns: [
+        /multi-level marketing/,
+        /network marketing opportunity/,
+        /pyramid scheme/,
+        /recruit.{0,20}(?:downline|distributors)/,
+        /传销|多层次营销|拉人头|发展下线|团队计酬/
+      ]
+    },
+    {
+      category: 'weapons-defense',
+      patterns: [
+        /weapons? systems?/,
+        /defense contractor/,
+        /military targeting/,
+        /firearms? manufacturer/,
+        /autonomous weapons?/,
+        /军工|武器系统|火器制造|军事打击|自主武器/
+      ]
+    }
   ]
 };
 
@@ -153,6 +245,16 @@ const riskSignals = rules.risk
   .filter(({ pattern }) => pattern.test(normalized))
   .map(({ code }) => code);
 
+const industrySignals = rules.industries.flatMap(({ category, patterns }) => {
+  const evidence = excerpts(patterns);
+  if (!evidence.length) return [];
+  return [{ category, action: contentPolicy[category] ?? 'review', evidence }];
+});
+
+let policyDecision = 'allow';
+if (industrySignals.some(({ action }) => action === 'block')) policyDecision = 'block';
+else if (industrySignals.some(({ action }) => action === 'review')) policyDecision = 'review';
+
 const timezones = excerpts(rules.timezone);
 const evidence = {
   positive: excerpts([...rules.globalRemote, ...rules.chinaIncluded]),
@@ -174,6 +276,8 @@ const result = {
   timezone: timezones.length ? { status: 'stated', evidence: timezones } : { status: 'unknown', evidence: [] },
   workAuthorization: signals.workAuthorizationConstraint ? 'constraint-stated' : 'unknown',
   riskSignals: [...new Set(riskSignals)],
+  industrySignals,
+  policyDecision,
   confidence: confidencePoints >= 3 ? 'high' : confidencePoints === 2 ? 'medium' : 'low',
   signals,
   evidence,
@@ -196,8 +300,8 @@ if (wantsSummary) {
   console.log(`用工形式：${engagement}`);
   console.log(`时区要求：${timezones.length ? '已识别' : '未说明'}`);
   console.log(`风险信号：${result.riskSignals.length ? result.riskSignals.join(', ') : '未发现明确信号'}`);
+  console.log(`行业策略：${policyDecision}${industrySignals.length ? ` (${industrySignals.map(({ category, action }) => `${category}:${action}`).join(', ')})` : ''}`);
   console.log(`置信度：${result.confidence}`);
 } else {
   console.log(JSON.stringify(result, null, 2));
 }
-

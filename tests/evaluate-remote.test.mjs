@@ -1,12 +1,15 @@
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 
 const script = fileURLToPath(new URL('../scripts/evaluate-remote.mjs', import.meta.url));
 
-function evaluate(jd) {
-  return JSON.parse(execFileSync(process.execPath, [script], {
+function evaluate(jd, extraArgs = []) {
+  return JSON.parse(execFileSync(process.execPath, [script, ...extraArgs], {
     input: jd,
     encoding: 'utf8'
   }));
@@ -51,4 +54,40 @@ test('flags upfront fees and unpaid trials', () => {
     远程兼职，入职前需要缴纳培训费，并完成无薪试岗。
   `);
   assert.deepEqual(result.riskSignals.sort(), ['unpaid-trial', 'upfront-fee']);
+});
+
+test('blocks adult and gambling industries with evidence', () => {
+  const result = evaluate(`
+    Remote worldwide engineering role for an online casino and adult entertainment platform.
+  `);
+  assert.equal(result.policyDecision, 'block');
+  assert.deepEqual(result.industrySignals.map(({ category }) => category).sort(), ['adult', 'gambling']);
+  assert.ok(result.industrySignals.every(({ evidence }) => evidence.length > 0));
+});
+
+test('routes web3 roles to review instead of calling them fraudulent', () => {
+  const result = evaluate(`
+    Remote worldwide backend engineer for a Web3 company building a blockchain protocol.
+  `);
+  assert.equal(result.policyDecision, 'review');
+  assert.equal(result.industrySignals[0].category, 'web3-crypto');
+  assert.equal(result.industrySignals[0].action, 'review');
+});
+
+test('does not flag ordinary wallet or token wording without industry context', () => {
+  const result = evaluate(`
+    Remote worldwide frontend role. You will work on design tokens and a customer loyalty wallet.
+  `);
+  assert.equal(result.policyDecision, 'allow');
+  assert.deepEqual(result.industrySignals, []);
+});
+
+test('allows users to override category actions with a local policy', (context) => {
+  const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'remote-fit-policy-'));
+  context.after(() => fs.rmSync(directory, { recursive: true, force: true }));
+  const policy = path.join(directory, 'policy.json');
+  fs.writeFileSync(policy, JSON.stringify({ 'web3-crypto': 'block' }));
+  const result = evaluate('Remote worldwide Web3 company building a blockchain protocol.', ['--policy', policy]);
+  assert.equal(result.policyDecision, 'block');
+  assert.equal(result.industrySignals[0].action, 'block');
 });

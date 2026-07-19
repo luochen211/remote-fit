@@ -40,6 +40,8 @@ System files:
 
 ## Remote eligibility gate
 
+Before remote eligibility, run the content-policy screen. Default to blocking adult, gambling, gray-market, and multi-level-marketing roles; route Web3/crypto and weapons/defense roles to review. Use `config/content-policy.json` when present. Always show the matched category, action, and source excerpt. Industry policy and scam risk are separate judgments.
+
 Before recommending an application, establish:
 
 1. Whether remote means fully remote, hybrid, or temporary work from home.
