@@ -13,6 +13,7 @@
 - 标记押金、培训费、免费试工和异常沟通方式等风险
 - 输出结构化 JSON，供 Codex 继续完成语义判断
 - 通过 Agent Skill 约束岗位评估和申请流程
+- 通过 SMTP 发送申请邮件，并强制执行两次人工确认
 - 严格区分用户数据与可升级的系统文件
 
 ## 快速开始
@@ -43,6 +44,37 @@ node scripts/evaluate-remote.mjs --file path/to/job-description.txt --summary
 
 缺失信息会保持 `unknown`，不会被自动解释成“可以申请”。
 
+## 双确认邮件发送
+
+复制 `.env.example` 为 `.env`，填写自己的 SMTP 地址和应用专用密码。凭据与待发送邮件都在 `.gitignore` 中，不会进入 Git。
+
+邮件发送被拆成两个不可跳过的确认阶段：
+
+1. Codex 展示完整的收件人、标题、正文和附件，用户第一次明确确认。
+2. 系统冻结邮件内容并生成一个 30 分钟有效的一次性发送码。Codex 再次展示摘要，用户必须原样回复发送码。
+3. 只有发送码、邮件摘要和附件哈希全部匹配，SMTP 才会发送邮件。
+
+第一次确认之后运行：
+
+```bash
+node scripts/send-application-email.mjs prepare \
+  --to jobs@example.com \
+  --subject "Application — Software Engineer" \
+  --body-file output/email.txt \
+  --attachment output/cv.pdf \
+  --confirm-draft YES-I-REVIEWED-THE-DRAFT
+```
+
+用户第二次确认并提供一次性发送码后运行：
+
+```bash
+node scripts/send-application-email.mjs send \
+  --approval <approval-id> \
+  --confirm SEND-XXXXXXXX
+```
+
+正文、收件人或附件发生任何改变都需要重新完成两次确认。Codex 不得代替用户输入确认内容。
+
 ## 项目原则
 
 - 真实岗位优先于岗位数量
@@ -50,6 +82,7 @@ node scripts/evaluate-remote.mjs --file path/to/job-description.txt --summary
 - 事实重写，绝不虚构
 - 低匹配岗位明确劝退
 - 可以起草和填写，永不自动提交
+- 邮件可以自动发送，但必须经过两次独立人工确认
 - CV、联系方式、投递记录默认只保存在本地
 
 ## 路线图
@@ -63,4 +96,3 @@ node scripts/evaluate-remote.mjs --file path/to/job-description.txt --summary
 ## License
 
 MIT
-

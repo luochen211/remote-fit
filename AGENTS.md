@@ -7,7 +7,7 @@ Remote Career Ops is a local-first, Codex-driven job-search workflow for Chinese
 - Optimize for roles that can actually be performed by a candidate based in China.
 - Treat `remote` as an unverified claim until location, timezone, work authorization, and engagement model are checked.
 - Prefer fewer high-fit applications over high-volume outreach.
-- Never submit, send, or publish an application without explicit user review and confirmation.
+- Never submit or publish an application. Email may be sent only through the repository's two-confirmation workflow.
 
 ## Source-of-truth boundary
 
@@ -61,7 +61,18 @@ Explicit exclusion beats generic remote language. If the posting says both `remo
 - Mark uncertain fields as `unknown`; never convert missing information into a positive signal.
 - Run `npm test` after changing scripts, schemas, or scoring rules.
 
+## Email sending
+
+- Drafting does not authorize sending.
+- Before the first confirmation, show the complete recipient list, subject, body, and attachment list.
+- Run the email `prepare` command only after the user explicitly approves that exact draft.
+- Show the complete second-confirmation summary and one-time code returned by the script.
+- Run the email `send` command only when the user independently repeats that exact code after seeing the summary.
+- Never infer either confirmation from an earlier request such as “apply”, “handle it”, or “send emails for me”.
+- Never type, reconstruct, or reuse a confirmation code on the user's behalf.
+- A changed recipient, subject, body, or attachment invalidates confirmation and restarts the process.
+- Do not expose SMTP credentials in chat, logs, commits, reports, or approval records.
+
 ## Output language
 
 Use `config/profile.yml` -> `language.output`, defaulting to Simplified Chinese (`zh-CN`). Preserve important English employment terms when translation would reduce precision.
-
