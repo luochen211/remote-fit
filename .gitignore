@@ -1,0 +1,11 @@
+config/profile.yml
+cv.md
+evidence/*
+!evidence/.gitkeep
+data/*
+!data/jobs.template.md
+!data/applications.template.md
+output/
+.DS_Store
+node_modules/
+

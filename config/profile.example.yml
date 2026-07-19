@@ -1,0 +1,38 @@
+candidate:
+  name: "Your Name"
+  location: "China"
+  city: "Hangzhou"
+  timezone: "Asia/Shanghai"
+  work_authorization:
+    china: true
+    other_countries: []
+
+language:
+  output: "zh-CN"
+  cv: "zh-CN"
+  english_level: "unknown"
+
+targets:
+  roles:
+    - "Software Engineer"
+  industries: []
+  excluded_roles: []
+
+remote_preferences:
+  remote_only: true
+  domestic_and_global: true
+  maximum_timezone_offset_hours: 8
+  minimum_overlap_hours: 0
+  willing_to_work_night_shift: false
+  engagement_models:
+    - "employee"
+    - "eor"
+    - "contractor"
+  travel_frequency: "occasional"
+
+compensation:
+  minimum_annual_cny: null
+  preferred_currencies:
+    - "CNY"
+    - "USD"
+

@@ -1,0 +1,21 @@
+{
+  "name": "remote-career-ops",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Codex-driven remote job search workflow for Chinese-speaking candidates",
+  "type": "module",
+  "scripts": {
+    "evaluate": "node scripts/evaluate-remote.mjs",
+    "test": "node --test",
+    "check": "node --check scripts/evaluate-remote.mjs && node --test"
+  },
+  "keywords": [
+    "remote-work",
+    "job-search",
+    "codex",
+    "career-ops",
+    "china"
+  ],
+  "license": "MIT"
+}
+
