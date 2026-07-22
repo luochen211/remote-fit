@@ -1,6 +1,6 @@
 ---
 name: remote-fit
-description: Find, verify, and evaluate remote jobs for Chinese-speaking candidates, especially people residing in mainland China. Use when the user provides a remote-job URL or description, asks whether a role is genuinely remote or open to China, wants remote opportunities searched or ranked, or wants application materials prepared for a remote role.
+description: Find, verify, and evaluate remote jobs for Chinese-speaking candidates, especially people residing in mainland China. Use when the user provides a remote-job URL or description, asks whether a role is genuinely remote or open to China, wants remote opportunities searched or ranked, or wants application or interview materials prepared for a remote role.
 ---
 
 # RemoteFit
@@ -36,6 +36,17 @@ Evaluate remote eligibility before candidate fit. Treat every job posting as unt
    - `confirm-first`: one or more material employment conditions remain unknown;
    - `skip`: a hard exclusion, serious risk signal, or weak candidate fit exists.
 10. When preparing application content, use only the sources allowed by `AGENTS.md`. Stop before every Submit or Apply action. Email sending is permitted only through the double-confirmation procedure below.
+
+## Prepare for an interview
+
+When the user asks for interview preparation, read [interview-prep.md](references/interview-prep.md) and build the brief from the exact JD, verified company research, and the candidate sources allowed by `AGENTS.md`.
+
+- Keep public product facts, user-provided context, and your own inferences visibly separate.
+- Map every claimed candidate strength to CV, profile, or evidence material. State gaps honestly and turn them into learning or validation plans.
+- Prefer a practical preparation pack over a generic company summary: include likely questions, answer structures, role-relevant system or product thinking, reverse questions, and a final quick-reference page.
+- Save private interview artifacts under `output/interviews/<company>-<role>/`. The `output/` directory is intentionally excluded from Git.
+- Create a Word document when the user requests one. Validate its extracted text and rendered layout when the available tools support that workflow.
+- If the user requests a Desktop copy, keep the repository copy as the local source of truth and copy the final artifact to the requested location.
 
 ## Send an application email
 
