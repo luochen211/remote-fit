@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "stage": "next-round",
+  "context": {
+    "company": "Example Company",
+    "role": "Full-stack Engineer",
+    "interviewDate": "2026-07-24"
+  },
+  "dimensions": {
+    "roleCompetence": {
+      "rating": 4,
+      "evidence": [
+        {
+          "quote": "粘贴面试稿中支持该评分的候选人原话",
+          "note": "说明这句话为何能证明岗位核心能力"
+        }
+      ]
+    },
+    "problemSolving": {
+      "rating": 3,
+      "evidence": [
+        {
+          "quote": "粘贴面试稿中的问题分析或解决过程",
+          "note": "说明候选人如何澄清问题、权衡方案或验证结果"
+        }
+      ]
+    },
+    "evidenceAndOwnership": {
+      "rating": 3,
+      "evidence": [
+        {
+          "quote": "粘贴面试稿中的个人行动与结果",
+          "note": "区分候选人的贡献、团队成果和未经验证的主张"
+        }
+      ]
+    },
+    "communication": {
+      "rating": null,
+      "evidence": []
+    },
+    "motivationAndRoleFit": {
+      "rating": null,
+      "evidence": []
+    },
+    "remoteCollaboration": {
+      "rating": null,
+      "evidence": []
+    }
+  },
+  "concerns": []
+}

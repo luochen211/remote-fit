@@ -19,6 +19,7 @@ RemoteFit 是面向中文用户的远程岗位资格验证工具，由 Codex 在
 - 输出结构化 JSON，供 Codex 继续完成语义判断
 - 通过 Agent Skill 约束岗位评估和申请流程
 - 基于真实 JD、公司研究与候选人证据生成个性化面试准备手册
+- 根据面试稿的原文证据给出评分、置信度和下一轮/最终通过建议
 - 通过 SMTP 发送申请邮件，并强制执行两次人工确认
 - 严格区分用户数据与可升级的系统文件
 
@@ -128,6 +129,30 @@ node scripts/send-application-email.mjs send \
 
 个人经历、薪资期望和联系方式等私密内容默认保存到 `output/interviews/`，不会被 Git 提交。
 
+## 面试稿评分
+
+面试结束后，把录音转写、面试稿或完整问答交给 Codex。RemoteFit 会按岗位核心能力、问题分析、经历证据与担当、表达协作、动机匹配和远程协作六个维度评分，并为每个非空评分保留候选人原话。
+
+结果同时包含：
+
+- `score`：基于已观察维度归一化的 100 分参考分；
+- `coverage`：实际获得原稿证据的权重覆盖率；
+- `confidence`：证据充分程度；
+- `decision`：`advance`、`pass`、`hold`、`do-not-advance`、`no-pass` 或 `insufficient-evidence`。
+
+没有问到的维度记为 `null`，不会被当成零分；但关键维度或证据覆盖不足时，系统会返回 `insufficient-evidence`，而不是猜测通过或淘汰。下一轮建议的通过线为 70 分，最终通过建议的通过线为 75 分；有原文证据的高严重度阻断项会覆盖总分。
+
+Codex 会先从面试稿生成结构化评估，再由脚本校验引用并固定计算结果：
+
+```bash
+node scripts/score-interview.mjs \
+  --transcript output/interviews/example-role/transcript.txt \
+  --assessment output/interviews/example-role/assessment.json \
+  --summary
+```
+
+评分模板见 `config/interview-scorecard.example.json`。面试稿、评分输入和复盘报告默认保存在 `output/interviews/`，不会提交到 Git。该结果是基于所提供记录的辅助判断，不代表雇主的实际决定。
+
 ## 项目原则
 
 - 真实岗位优先于岗位数量
@@ -143,7 +168,7 @@ node scripts/send-application-email.mjs send \
 - 国内外远程岗位源与去重
 - 原始招聘页存活验证
 - 中英文 CV 与申请材料
-- 申请追踪、回复分类与面试复盘
+- 申请追踪与回复分类
 - 基于真实结果校准远程资格模型
 
 ## License
