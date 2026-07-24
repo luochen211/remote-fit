@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "stage": "next-round",
+  "evaluatedAt": "2026-07-24T18:00:00+08:00",
+  "context": {
+    "company": "Example Company",
+    "role": "Full-stack Engineer"
+  },
+  "actions": [],
+  "promises": [
+    {
+      "quote": "粘贴对方承诺反馈时间的原文",
+      "dueAt": "2026-07-28T23:59:59+08:00"
+    }
+  ],
+  "discardedSignals": [
+    {
+      "type": "verbal-praise",
+      "quote": "粘贴面试过程中的表扬原文",
+      "reason": "没有伴随可验证的下一步行为，因此预测权重为零"
+    }
+  ]
+}

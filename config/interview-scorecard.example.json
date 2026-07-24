@@ -1,5 +1,6 @@
 {
   "schemaVersion": 1,
+  "purpose": "candidate-coaching-only",
   "stage": "next-round",
   "context": {
     "company": "Example Company",

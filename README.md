@@ -19,7 +19,7 @@ RemoteFit 是面向中文用户的远程岗位资格验证工具，由 Codex 在
 - 输出结构化 JSON，供 Codex 继续完成语义判断
 - 通过 Agent Skill 约束岗位评估和申请流程
 - 基于真实 JD、公司研究与候选人证据生成个性化面试准备手册
-- 根据面试稿的原文证据给出评分、置信度和下一轮/最终通过建议
+- 分离面试表现复盘与结果追踪，只用真实下一步行为确认晋级或拒绝
 - 通过 SMTP 发送申请邮件，并强制执行两次人工确认
 - 严格区分用户数据与可升级的系统文件
 
@@ -129,20 +129,14 @@ node scripts/send-application-email.mjs send \
 
 个人经历、薪资期望和联系方式等私密内容默认保存到 `output/interviews/`，不会被 Git 提交。
 
-## 面试稿评分
+## 面试复盘与结果追踪
 
-面试结束后，把录音转写、面试稿或完整问答交给 Codex。RemoteFit 会按岗位核心能力、问题分析、经历证据与担当、表达协作、动机匹配和远程协作六个维度评分，并为每个非空评分保留候选人原话。
+RemoteFit 把两个任务彻底分开：
 
-结果同时包含：
+1. **表现复盘**：分析候选人回答中展示的能力、证据和改进点；
+2. **结果追踪**：只根据雇主已经完成的下一步行为确认晋级、通过或拒绝。
 
-- `score`：基于已观察维度归一化的 100 分参考分；
-- `coverage`：实际获得原稿证据的权重覆盖率；
-- `confidence`：证据充分程度；
-- `decision`：`advance`、`pass`、`hold`、`do-not-advance`、`no-pass` 或 `insufficient-evidence`。
-
-没有问到的维度记为 `null`，不会被当成零分；但关键维度或证据覆盖不足时，系统会返回 `insufficient-evidence`，而不是猜测通过或淘汰。下一轮建议的通过线为 70 分，最终通过建议的通过线为 75 分；有原文证据的高严重度阻断项会覆盖总分。
-
-Codex 会先从面试稿生成结构化评估，再由脚本校验引用并固定计算结果：
+表现复盘可以按岗位核心能力、问题分析、经历证据与担当、表达协作、动机匹配和远程协作六个维度生成 `coachingScore`。这个分数只用于自我改进，明确设置 `predictsEmployerOutcome: false`，不会再输出晋级建议。
 
 ```bash
 node scripts/score-interview.mjs \
@@ -151,7 +145,33 @@ node scripts/score-interview.mjs \
   --summary
 ```
 
-评分模板见 `config/interview-scorecard.example.json`。面试稿、评分输入和复盘报告默认保存在 `output/interviews/`，不会提交到 Git。该结果是基于所提供记录的辅助判断，不代表雇主的实际决定。
+结果追踪采用“真实行为或未知”原则。以下信息的预测权重一律为零：
+
+- “简历很优秀”“经验很好”等口头表扬；
+- 点头、语气、长时间追问或面试时长；
+- 薪资、时间、地点和到岗问题；
+- “如果有下一步”“可能会安排二面”等条件式表述；
+- 对标准招聘流程的介绍。
+
+只有已经发生、且能在记录中找到凭证的动作可以改变结果状态，例如：
+
+- 收到书面晋级通知；
+- 收到具体二面时间或日历邀请；
+- 收到真实任务或与决策人的已确认会议；
+- 收到 Offer、书面拒绝或流程终止通知。
+
+```bash
+node scripts/estimate-interview-outcome.mjs \
+  --record output/interviews/example-role/interaction-record.md \
+  --observation output/interviews/example-role/outcome-observation.json \
+  --summary
+```
+
+没有真实下一步行为时，结果固定为 `unknown-no-action`，结果置信度为 `0`。承诺的反馈期限尚未到达时保持未知；期限过去仍无行动，只记为弱负向 `overdue-no-action`，不冒充正式拒绝。
+
+`behavioralCommitmentScore` 是行为证据强度，不是通过概率。没有经过历史“信号—实际结果”数据校准前，`probability` 始终为 `null`。
+
+模板见 `config/interview-scorecard.example.json` 和 `config/interview-outcome.example.json`。面试稿、后续消息、评估输入和报告默认保存在 `output/interviews/`，不会提交到 Git。
 
 ## 项目原则
 

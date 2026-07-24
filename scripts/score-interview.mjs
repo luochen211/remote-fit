@@ -13,21 +13,6 @@ export const DIMENSIONS = Object.freeze([
   { key: 'remoteCollaboration', label: '远程协作准备度', weight: 5, critical: false }
 ]);
 
-export const STAGES = Object.freeze({
-  'next-round': {
-    positiveDecision: 'advance',
-    negativeDecision: 'do-not-advance',
-    positiveThreshold: 70,
-    holdThreshold: 60
-  },
-  final: {
-    positiveDecision: 'pass',
-    negativeDecision: 'no-pass',
-    positiveThreshold: 75,
-    holdThreshold: 65
-  }
-});
-
 function usage(message) {
   if (message) console.error(message);
   console.error(
@@ -112,8 +97,7 @@ export function scoreInterview(assessment, transcript) {
   }
 
   const stage = assessment.stage;
-  const stageConfig = STAGES[stage];
-  if (!stageConfig) {
+  if (!['next-round', 'final'].includes(stage)) {
     throw new Error('assessment.stage must be next-round or final');
   }
   assertPlainObject(assessment.dimensions, 'assessment.dimensions');
@@ -166,73 +150,40 @@ export function scoreInterview(assessment, transcript) {
   });
 
   const concerns = validateConcerns(assessment.concerns, transcript);
-  const blockingConcerns = concerns.filter(({ severity }) => severity === 'high');
+  const priorityConcerns = concerns.filter(({ severity }) => severity === 'high');
   const score = ratedWeight ? round((earnedPoints / ratedWeight) * 100) : null;
   const coverage = ratedWeight;
-  const confidence = coverage >= 85 && !unratedCriticalDimensions.length
+  const evidenceConfidence = coverage >= 85 && !unratedCriticalDimensions.length
     ? 'high'
     : coverage >= 70 && !unratedCriticalDimensions.length
       ? 'medium'
       : 'low';
 
-  let decision;
-  let decisionReason;
-  if (blockingConcerns.length) {
-    decision = stageConfig.negativeDecision;
-    decisionReason = '存在有原文证据的高严重度阻断项';
-  } else if (confidence === 'low') {
-    decision = 'insufficient-evidence';
-    decisionReason = '关键维度或证据覆盖率不足，不能可靠做出晋级判断';
-  } else if (score >= stageConfig.positiveThreshold) {
-    decision = stageConfig.positiveDecision;
-    decisionReason = `参考分达到 ${stageConfig.positiveThreshold} 分门槛`;
-  } else if (score >= stageConfig.holdThreshold) {
-    decision = 'hold';
-    decisionReason = `参考分处于 ${stageConfig.holdThreshold}–${stageConfig.positiveThreshold - 1} 分复核区间`;
-  } else {
-    decision = stageConfig.negativeDecision;
-    decisionReason = `参考分低于 ${stageConfig.holdThreshold} 分`;
-  }
-
   return {
     schemaVersion: 1,
     stage,
     context: assessment.context ?? {},
-    score,
-    coverage,
-    confidence,
-    decision,
-    decisionReason,
-    thresholds: {
-      positive: stageConfig.positiveThreshold,
-      hold: stageConfig.holdThreshold
-    },
+    coachingScore: score,
+    evidenceCoverage: coverage,
+    evidenceConfidence,
     dimensions,
     concerns,
-    blockingConcerns,
+    priorityConcerns,
     unratedCriticalDimensions,
-    caveat: '该结果是基于所提供面试稿的辅助判断，不代表雇主实际决定；未在原稿出现的信息不会被推断。'
+    predictsEmployerOutcome: false,
+    caveat: '该分数只用于候选人复盘和改进，不得用于预测晋级或代表雇主判断。雇主结果只能由可验证的下一步行为确认。'
   };
 }
 
 function formatSummary(result) {
-  const decisionLabels = {
-    advance: '建议进入下一轮',
-    pass: '建议通过',
-    hold: '待复核',
-    'do-not-advance': '不建议进入下一轮',
-    'no-pass': '不建议通过',
-    'insufficient-evidence': '证据不足，暂不判断'
-  };
   const lines = [
-    `判断：${decisionLabels[result.decision]}`,
-    `参考分：${result.score === null ? '无法计算' : `${result.score}/100`}`,
-    `证据覆盖率：${result.coverage}%`,
-    `置信度：${result.confidence}`,
-    `原因：${result.decisionReason}`
+    '用途：候选人表现复盘（不预测晋级）',
+    `复盘参考分：${result.coachingScore === null ? '无法计算' : `${result.coachingScore}/100`}`,
+    `证据覆盖率：${result.evidenceCoverage}%`,
+    `证据置信度：${result.evidenceConfidence}`
   ];
-  if (result.blockingConcerns.length) {
-    lines.push(`阻断项：${result.blockingConcerns.map(({ type }) => type).join(', ')}`);
+  if (result.priorityConcerns.length) {
+    lines.push(`优先改进项：${result.priorityConcerns.map(({ type }) => type).join(', ')}`);
   }
   lines.push(result.caveat);
   return lines.join('\n');

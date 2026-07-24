@@ -38,25 +38,26 @@ function assessment(overrides = {}) {
   };
 }
 
-test('scores a fully evidenced next-round interview', () => {
+test('scores a fully evidenced interview for coaching only', () => {
   const result = scoreInterview(assessment(), transcript);
-  assert.equal(result.score, 78);
-  assert.equal(result.coverage, 100);
-  assert.equal(result.confidence, 'high');
-  assert.equal(result.decision, 'advance');
+  assert.equal(result.coachingScore, 78);
+  assert.equal(result.evidenceCoverage, 100);
+  assert.equal(result.evidenceConfidence, 'high');
+  assert.equal(result.predictsEmployerOutcome, false);
+  assert.equal('decision' in result, false);
 });
 
-test('uses a higher threshold for a final interview', () => {
+test('does not turn a final interview coaching score into a pass decision', () => {
   const input = assessment();
   input.stage = 'final';
   input.dimensions.roleCompetence.rating = 3;
   const result = scoreInterview(input, transcript);
-  assert.equal(result.score, 72);
-  assert.equal(result.decision, 'hold');
-  assert.equal(result.thresholds.positive, 75);
+  assert.equal(result.coachingScore, 72);
+  assert.equal(result.predictsEmployerOutcome, false);
+  assert.equal('thresholds' in result, false);
 });
 
-test('returns insufficient evidence instead of treating unasked dimensions as failures', () => {
+test('lowers evidence confidence instead of treating unasked dimensions as failures', () => {
   const result = scoreInterview(assessment({
     dimensions: {
       evidenceAndOwnership: { rating: null, evidence: [] },
@@ -65,14 +66,13 @@ test('returns insufficient evidence instead of treating unasked dimensions as fa
       remoteCollaboration: { rating: null, evidence: [] }
     }
   }), transcript);
-  assert.equal(result.score, 80);
-  assert.equal(result.coverage, 50);
-  assert.equal(result.confidence, 'low');
-  assert.equal(result.decision, 'insufficient-evidence');
+  assert.equal(result.coachingScore, 80);
+  assert.equal(result.evidenceCoverage, 50);
+  assert.equal(result.evidenceConfidence, 'low');
   assert.deepEqual(result.unratedCriticalDimensions, ['evidenceAndOwnership']);
 });
 
-test('high severity evidence-backed concern overrides a high score', () => {
+test('high severity evidence-backed concern remains a coaching priority only', () => {
   const result = scoreInterview(assessment({
     concerns: [{
       type: 'availability-mismatch',
@@ -81,8 +81,9 @@ test('high severity evidence-backed concern overrides a high score', () => {
       reason: '示例阻断项，用于验证决策覆盖规则'
     }]
   }), transcript);
-  assert.equal(result.decision, 'do-not-advance');
-  assert.equal(result.blockingConcerns.length, 1);
+  assert.equal(result.coachingScore, 78);
+  assert.equal(result.priorityConcerns.length, 1);
+  assert.equal(result.predictsEmployerOutcome, false);
 });
 
 test('rejects evidence that does not occur in the transcript', () => {

@@ -1,4 +1,4 @@
 interface:
   display_name: "RemoteFit"
-  short_description: "Evaluate remote roles and interview evidence"
-  default_prompt: "Use $remote-fit to evaluate whether this remote role is open to a candidate in China, or to score a completed interview transcript."
+  short_description: "Evaluate remote roles and track interview outcomes"
+  default_prompt: "Use $remote-fit to evaluate whether this remote role is open to a candidate in China, review an interview for coaching, or track its outcome from verifiable employer actions."
