@@ -73,8 +73,9 @@ const rules = {
   chinaExcluded: [
     /excluding china/,
     /except china/,
-    /not open to (?:china|(?:candidates?|applicants?|people)(?: (?:based|located|living|residing))? (?:in|from) china)\b/,
+    /(?:not|(?:is|are)n['’]t) open to (?:china|(?:candidates?|applicants?|people)(?: (?:based|located|living|residing))? (?:in|from) china)\b/,
     /(?:do(?:es)? not|do(?:es)?n['’]t) hire(?: (?:candidates?|applicants?|people)(?: (?:based|located|living|residing))?)? (?:in|from) china\b/,
+    /(?:not|(?:is|are)n['’]t) hiring (?:in|from) china\b/,
     /not available in china/,
     /cannot hire in china/,
     /不包含中国/,

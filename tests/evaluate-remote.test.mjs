@@ -103,7 +103,14 @@ test('treats explicit China negations as exclusions', () => {
     "Remote role. We don't hire in China.",
     "Remote role. The company doesn't hire in China.",
     'Remote role. We don’t hire in China.',
-    'Remote role. The company doesn’t hire in China.'
+    'Remote role. The company doesn’t hire in China.',
+    'Remote role. We are not hiring in China.',
+    "Remote role. The company isn't hiring in China.",
+    "Remote role. We aren't open to candidates in China.",
+    "Remote role. The company isn't open to applicants from China.",
+    'Remote role. The company isn’t hiring in China.',
+    'Remote role. We aren’t open to candidates in China.',
+    'Remote role. The company isn’t open to applicants from China.'
   ];
 
   for (const posting of postings) {
@@ -119,7 +126,8 @@ test('treats explicit China negations as exclusions', () => {
 test('does not carry unrelated negations across clauses into China exclusions', () => {
   const postings = [
     'Remote role. Not open to India; open to China.',
-    'Remote role. We do not hire agencies; hiring in China.'
+    'Remote role. We do not hire agencies; hiring in China.',
+    'Remote role. We are not hiring agencies; hiring in China.'
   ];
 
   for (const posting of postings) {
