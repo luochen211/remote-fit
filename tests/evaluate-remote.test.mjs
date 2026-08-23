@@ -98,7 +98,12 @@ test('accepts explicit China inclusion', () => {
 test('treats explicit China negations as exclusions', () => {
   const postings = [
     'Remote role. We are not open to candidates located in China.',
-    'Remote role. We do not hire in China.'
+    'Remote role. We do not hire in China.',
+    'Remote role. We are not open to candidates from China.',
+    "Remote role. We don't hire in China.",
+    "Remote role. The company doesn't hire in China.",
+    'Remote role. We don’t hire in China.',
+    'Remote role. The company doesn’t hire in China.'
   ];
 
   for (const posting of postings) {
