@@ -73,8 +73,8 @@ const rules = {
   chinaExcluded: [
     /excluding china/,
     /except china/,
-    /not open to.{0,40}\bchina\b/,
-    /do(?:es)? not hire.{0,30}\bchina\b/,
+    /not open to (?:china|(?:candidates?|applicants?|people)(?: (?:based|located|living|residing))? in china)\b/,
+    /do(?:es)? not hire(?: (?:candidates?|applicants?|people)(?: (?:based|located|living|residing))?)? in china\b/,
     /not available in china/,
     /cannot hire in china/,
     /不包含中国/,
