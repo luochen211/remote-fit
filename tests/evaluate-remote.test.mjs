@@ -73,6 +73,28 @@ test('unknown location stays unknown instead of becoming eligible', () => {
   assert.equal(result.engagement, 'unknown');
 });
 
+test('keeps broad APAC wording at needs-confirmation', () => {
+  const postings = [
+    'Remote role open to candidates located in APAC.',
+    'Remote role open to candidates located in Asia-Pacific.',
+    '面向亚太地区候选人的远程工作。'
+  ];
+
+  for (const posting of postings) {
+    const result = evaluate(posting);
+    assert.equal(result.chinaEligibility, 'needs-confirmation');
+    assert.equal(result.signals.chinaIncluded, false);
+  }
+});
+
+test('accepts explicit China inclusion', () => {
+  const result = evaluate(`
+    Remote role open to candidates located in China. This is an independent contractor position.
+  `);
+  assert.equal(result.chinaEligibility, 'likely-eligible');
+  assert.equal(result.signals.chinaIncluded, true);
+});
+
 test('flags upfront fees and unpaid trials', () => {
   const result = evaluate(`
     远程兼职，入职前需要缴纳培训费，并完成无薪试岗。

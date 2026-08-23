@@ -68,10 +68,7 @@ const rules = {
   ],
   chinaIncluded: [
     /(?:open to|hiring in|based in|located in).{0,30}\bchina\b/,
-    /\bapac\b/,
-    /asia[- ]?pacific/,
-    /中国境内/,
-    /亚太地区/
+    /中国境内/
   ],
   chinaExcluded: [
     /excluding china/,
