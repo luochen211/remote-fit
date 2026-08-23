@@ -95,6 +95,22 @@ test('accepts explicit China inclusion', () => {
   assert.equal(result.signals.chinaIncluded, true);
 });
 
+test('treats explicit China negations as exclusions', () => {
+  const postings = [
+    'Remote role. We are not open to candidates located in China.',
+    'Remote role. We do not hire in China.'
+  ];
+
+  for (const posting of postings) {
+    const result = evaluate(posting);
+    assert.equal(result.chinaEligibility, 'not-eligible');
+    assert.equal(result.signals.chinaExcluded, true);
+    assert.equal(result.signals.chinaIncluded, false);
+    assert.deepEqual(result.evidence.positive, []);
+    assert.ok(result.evidence.exclusions.length > 0);
+  }
+});
+
 test('flags upfront fees and unpaid trials', () => {
   const result = evaluate(`
     远程兼职，入职前需要缴纳培训费，并完成无薪试岗。

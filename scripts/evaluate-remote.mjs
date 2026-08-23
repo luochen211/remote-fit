@@ -73,6 +73,8 @@ const rules = {
   chinaExcluded: [
     /excluding china/,
     /except china/,
+    /not open to.{0,40}\bchina\b/,
+    /do(?:es)? not hire.{0,30}\bchina\b/,
     /not available in china/,
     /cannot hire in china/,
     /不包含中国/,
@@ -214,12 +216,13 @@ function excerpts(patterns) {
   return [...new Set(found)];
 }
 
+const chinaExcluded = matches(rules.chinaExcluded);
 const signals = {
   globalRemote: matches(rules.globalRemote),
   remote: matches(rules.remote),
   hybrid: matches(rules.hybrid),
-  chinaIncluded: matches(rules.chinaIncluded),
-  chinaExcluded: matches(rules.chinaExcluded),
+  chinaIncluded: !chinaExcluded && matches(rules.chinaIncluded),
+  chinaExcluded,
   regionRestricted: matches(rules.regionRestricted),
   relocationRequired: matches(rules.relocation),
   workAuthorizationConstraint: matches(rules.workAuthorization)
@@ -257,7 +260,10 @@ else if (industrySignals.some(({ action }) => action === 'review')) policyDecisi
 
 const timezones = excerpts(rules.timezone);
 const evidence = {
-  positive: excerpts([...rules.globalRemote, ...rules.chinaIncluded]),
+  positive: [
+    ...excerpts(rules.globalRemote),
+    ...(signals.chinaIncluded ? excerpts(rules.chinaIncluded) : [])
+  ],
   exclusions: excerpts([...rules.chinaExcluded, ...rules.regionRestricted, ...rules.relocation, ...rules.hybrid]),
   authorization: excerpts(rules.workAuthorization),
   timezone: timezones
