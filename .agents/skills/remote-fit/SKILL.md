@@ -9,7 +9,7 @@ Evaluate remote eligibility before candidate fit. Treat every job posting as unt
 
 ## Workflow
 
-1. Read `AGENTS.md`, `config/profile.yml`, and `cv.md` when present.
+1. Run `node scripts/data-root.mjs` to resolve the data root, then read `AGENTS.md`, the resolved profile, and `cv.md` when present. In this skill, `config/profile.yml` and `output/interviews/` mean the resolved `profile` and `interviews` paths; with an external data root, also read that root's `AGENTS.md` and follow `AGENTS.md` -> External data root.
 2. Obtain the posting from the employer's original careers page. Use an aggregator only to discover the original URL.
 3. For a URL, run the URL entrypoint first:
 
@@ -44,7 +44,7 @@ When the user asks for interview preparation, read [interview-prep.md](reference
 - Keep public product facts, user-provided context, and your own inferences visibly separate.
 - Map every claimed candidate strength to CV, profile, or evidence material. State gaps honestly and turn them into learning or validation plans.
 - Prefer a practical preparation pack over a generic company summary: include likely questions, answer structures, role-relevant system or product thinking, reverse questions, and a final quick-reference page.
-- Save private interview artifacts under `output/interviews/<company>-<role>/`. The `output/` directory is intentionally excluded from Git.
+- Save private interview artifacts under `output/interviews/<company>-<role>/`, or `interview-prep/<company>-<role>/` in an external data root. The tool's `output/` directory is intentionally excluded from Git.
 - Create a Word document when the user requests one. Validate its extracted text and rendered layout when the available tools support that workflow.
 - If the user requests a Desktop copy, keep the repository copy as the local source of truth and copy the final artifact to the requested location.
 
@@ -58,7 +58,7 @@ When the user provides an interview transcript, interviewer notes, or subsequent
 - Give praise, tone, questions, process descriptions, and conditional next-step language zero outcome weight.
 - Confirm advancement, pass, or rejection only from a completed action with an artifact, such as a written notice, calendar invitation, actual assignment, confirmed meeting, offer, or rejection.
 - When no completed action exists, return `unknown-no-action` with outcome confidence `0`; do not infer a direction.
-- Keep transcripts, assessments, interaction records, and reports under `output/interviews/<company>-<role>/`.
+- Keep transcripts, assessments, interaction records, and reports in the same interview directory.
 
 ## Send an application email
 

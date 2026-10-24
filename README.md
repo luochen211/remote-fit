@@ -129,6 +129,25 @@ node scripts/send-application-email.mjs send \
 
 个人经历、薪资期望和联系方式等私密内容默认保存到 `output/interviews/`，不会被 Git 提交。
 
+## 作为子功能接入其他仓库
+
+RemoteFit 可以作为 git submodule 挂进别的仓库，用户数据放在另一个私有目录里。在工具目录下写一个只有一行路径的 `.remote-fit-data` 文件（已被 Git 忽略），或者设置环境变量 `REMOTE_FIT_DATA`，指向这个数据目录：
+
+```bash
+git submodule add https://github.com/luochen211/remote-fit.git tools/remote-fit
+echo /path/to/private-data > tools/remote-fit/.remote-fit-data
+node tools/remote-fit/scripts/data-root.mjs   # 打印实际使用的路径
+```
+
+接入后：
+
+- `cv.md`、`evidence/`、`data/` 从数据目录读取；
+- RemoteFit 的偏好设置放在数据目录的 `config/remote-fit.yml`，不和其他工具的 `config/profile.yml` 冲突；
+- 面试准备手册、面试记录和复盘写到数据目录的 `interview-prep/<公司>-<岗位>/`；
+- Agent 会先读数据目录自己的 `AGENTS.md`，按那里的隐私规则处理。
+
+数据目录必须是私有的，不要把它指向公开仓库。
+
 ## 面试复盘与结果追踪
 
 RemoteFit 把两个任务彻底分开：
