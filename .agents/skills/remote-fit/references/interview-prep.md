@@ -81,4 +81,6 @@ output/interviews/<company>-<role>/
 └── jd.txt                      # optional saved posting
 ```
 
-These files can contain personal history, compensation expectations, contact details, and private application context. Keep them under the ignored `output/` directory unless the user explicitly requests publication after reviewing a redacted version.
+With an external data root, use `interview-prep/<company>-<role>/` in that root instead, and follow its `AGENTS.md` on whether those files may be committed.
+
+These files can contain personal history, compensation expectations, contact details, and private application context. Keep them under the ignored `output/` directory, or in the private data root, unless the user explicitly requests publication after reviewing a redacted version. Never put them in a public repository.

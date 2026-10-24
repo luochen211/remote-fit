@@ -30,6 +30,18 @@ User data, never overwritten by system updates:
 - `data/`
 - `output/`
 
+### External data root
+
+RemoteFit can run as a subfeature of another repository, such as a git submodule inside a career data repository. Point it at a data root with the `REMOTE_FIT_DATA` environment variable or a one-line `.remote-fit-data` file in the tool checkout (the variable wins; relative paths resolve from the tool checkout). Run `node scripts/data-root.mjs` to print the resolved paths.
+
+With an external data root:
+
+- read the data root's `AGENTS.md` first and follow its privacy rules; it may name other candidate sources, such as an evidence digest;
+- read `cv.md`, `evidence/`, and `data/` from the data root;
+- read RemoteFit preferences from `config/remote-fit.yml` in the data root, because `config/profile.yml` there may belong to another tool;
+- write interview artifacts to `interview-prep/<company>-<role>/` in the data root instead of `output/interviews/`;
+- never write candidate data into the tool checkout.
+
 System files:
 
 - `AGENTS.md`
