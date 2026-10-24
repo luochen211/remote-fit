@@ -1,5 +1,10 @@
 # RemoteFit
 
+> **本项目已于 2026-10-24 停止维护并归档，代码保留只读。**
+>
+> - 面试前准备、面试复盘与结果追踪已迁到 [career-data](https://github.com/luochen211/career-data)：`modes/interview-prep.md`、`modes/interview-review.md`，以及 `scripts/` 下的两个脚本。
+> - 远程岗位资格判断计划并入 [career-ops](https://github.com/career-ops-hq/career-ops)，作为 `modes/regional/cn-remote.md`，见 [career-ops#5793](https://github.com/career-ops-hq/career-ops/issues/5793)。
+
 **Verify whether a remote job is truly workable from China.**
 
 RemoteFit 是面向中文用户的远程岗位资格验证工具，由 Codex 在本地驱动。
